@@ -1,0 +1,2 @@
+:: tool <input path> <output path> <column name> <value>
+C:\Anaconda3\python.exe C:\RemoteSensing\Useful_Scripts\csv_find_decimal_value.py K:\ABP_2023\09_TreeTools K:\ABP_2023\09_TreeTools\QC_succed CCI 90

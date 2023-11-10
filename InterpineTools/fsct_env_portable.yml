@@ -1,0 +1,26 @@
+name: fsctbase
+channels:
+  - pyg
+  - nvidia/label/cuda-11.6.0
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - cudatoolkit=11.6
+  - torchvision
+  - torchaudio
+  - hdbscan
+  - pip
+  - cuda
+  - pytorch-cluster
+  - scikit-image
+  - scikit-spatial
+  - networkx
+  - laspy[lazrs,laszip]
+  - pandas
+  - matplotlib
+  - pip:
+      - torch_geometric
+      - pdfkit
+      - Jinja2

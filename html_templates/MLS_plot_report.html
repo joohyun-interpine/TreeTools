@@ -1,0 +1,120 @@
+{# html_templates/MLS_plot_report.txt #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="pdfkit-page-size" content="A4"/>
+<meta name="pdfkit-orientation" content="Portrait"/>
+<title>MLS Plot Report</title>
+<style>
+h1 {
+    font-size: 4em;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: normal;
+    font-family: Arial;
+    font-size: 100%;
+}
+p {
+    font-family: Arial;
+    font-size: 80%;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+table, tr, td, th, tbody, thead, tfoot {
+    page-break-inside: avoid;
+    font-family: Arial;
+    border: 1px solid #111111;
+    text-align: left;
+    padding: 4px;
+}
+th {
+  text-wrap: wrap;
+  color: #FFFFFF;
+  background: #000000;
+}
+</style>
+</head>
+
+<img src="file:///C:/RemoteSensing/MLS/TreeTools/html_templates/InterpineLogo.png" alt="Interpine Logo" style="float:right;width:300px;">
+<h1>3D SCAN PLOT REPORT</h1>
+<p> TreeTools Version 2.0.0</p>
+<p></p>
+<p></p>
+<div>
+<table>
+    <thead>
+    <tr>
+    <th >Plot ID</th>
+    <th >Scan File Name</th>
+    <th >Scan Date</th>
+    <th >Processing Time (mm:ss)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>{{plot_id}}</td>
+    <td >{{filename}}</td>
+    <td >{{scan_date}}</td>
+    <td >{{processing_time}}</td>
+    </tr>
+    </tbody>
+</table>
+</div>
+<p></p>
+<div>
+<table>
+    <thead>
+    <tr>
+    <th >Plot Attribute</th>
+    <th >Value / Min</th>
+    <th >Mean</th>
+    <th >Max</th>
+    <th >Units / Comments</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for name in report_summary %}
+        <tr>
+        <td >{{name.attribute}}</td>
+        <td >{{name.min}}</td>
+        <td >{{name.mean}}</td>
+        <td >{{name.max}}</td>
+        <td >{{name.units}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<div></div><p><img src="{{canopy_plot}}" width="500"/></p></div>
+<div></div><p><img src="{{dbh_height_plot}}" width="700"/></p></div>
+<div></div><p><img src="{{dbh_map_plot}}" width="780"/>  </p></div>
+<p></p>
+<p></p>
+<table>
+    <thead>
+    <tr>
+        {% for column_name in tree_data_columns %}
+            <th>{{column_name}}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+        {% for index,row in tree_data.iterrows() %}
+            <tr>
+            {%for column in tree_data_columns %}
+            <td style="text-align: right;">{{row[column]}}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+</body>
+</html>
+                        

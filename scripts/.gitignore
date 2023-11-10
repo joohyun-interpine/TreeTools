@@ -1,0 +1,10 @@
+*.npy
+*.las
+*.png
+*.bak
+__pycache__
+.vscode
+venv
+docker
+tools
+model
