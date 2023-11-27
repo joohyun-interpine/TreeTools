@@ -132,7 +132,7 @@ def subsample_point_cloud(pointcloud, min_spacing, num_procs=1):
     return pointcloud
 
 
-def load_file(filename, plot_centre=None, plot_radius=0, plot_radius_buffer=0, silent=False, headers_of_interest=None, return_num_points=False):
+def load_file(filename, plot_centre=None, plot_radius=0, plot_radius_buffer=0, silent=False, headers_of_interest=None, return_num_points=False):    
     if headers_of_interest is None:
         headers_of_interest = []
     if not silent:
@@ -140,15 +140,15 @@ def load_file(filename, plot_centre=None, plot_radius=0, plot_radius_buffer=0, s
     file_extension = filename[-4:]
     coord_headers = ['x', 'y', 'z']
     output_headers = []
-
+    
     if file_extension == '.las' or file_extension == '.laz':
         inFile = laspy.read(filename)
         header_names = list(inFile.point_format.dimension_names)
         # print(header_names)
-        pointcloud = np.vstack((inFile.x, inFile.y, inFile.z))      
+        pointcloud = np.vstack((inFile.x, inFile.y, inFile.z))
         #pointcloud = np.vstack((inFile.X, inFile.Y, inFile.Z))     # Aglika - TODO Change to integer computations for coordinates 
         if len(headers_of_interest) != 0:
-            headers_of_interest = headers_of_interest[3:]
+            headers_of_interest = headers_of_interest[3:] # Get lid of the xyz co-ordinates, then remains the other infos
             for header in headers_of_interest:
                 if header in header_names:
                     pointcloud = np.vstack((pointcloud, getattr(inFile, header)))

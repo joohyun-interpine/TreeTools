@@ -37,6 +37,7 @@ class TestingDataset(Dataset, ABC):
         local_shift = torch.round(torch.mean(pos[:, :3], axis=0)).requires_grad_(False)
         pos = pos - local_shift
         data = Data(pos=pos, x=None, local_shift=local_shift)
+        
         return data
 
 
@@ -52,8 +53,8 @@ def choose_most_confident_label(point_cloud, original_point_cloud):
 
     print("Choosing most confident labels...")
     # with config_context(target_offload="gpu:0"):
-    neighbours = NearestNeighbors(n_neighbors=5, algorithm='kd_tree', metric='euclidean', radius=0.05, n_jobs=4).fit(
-        point_cloud[:, :3])
+    # This is important stage for labeling as a prediction
+    neighbours = NearestNeighbors(n_neighbors=5, algorithm='kd_tree', metric='euclidean', radius=0.05, n_jobs=4).fit(point_cloud[:, :3])
     _, indices = neighbours.kneighbors(original_point_cloud[:, :3])
 
     # print("finding median label value")
@@ -84,7 +85,7 @@ class SemanticSegmentation:
         self.parameters = parameters
         if not self.parameters['use_CPU_only']:
             print('Is CUDA available?', torch.cuda.is_available())
-            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')            
         else:
             self.device = torch.device('cpu')
 
@@ -108,21 +109,32 @@ class SemanticSegmentation:
         self.plot_centre = [[float(self.plot_summary['Plot Centre X'].item()), float(self.plot_summary['Plot Centre Y'].item())]]
 
     def inference(self):
+        # 1. 0. Data preparation
+        # 1. 1. List up the small cubic .npy data
         test_dataset = TestingDataset(root_dir=self.working_dir,
                                       points_per_box=self.parameters['max_points_per_box'],
                                       device=self.device)
-
+        # 1. 2. Tensorising for loading using listed small cubic npy data based on the number of batch size
         test_loader = DataLoader(test_dataset, batch_size=self.parameters['batch_size'], shuffle=False,
                                  num_workers=0)
 
+        # 1. 3. Kill the Torch cache and GPU memory
         force_cudnn_initialization()  # Aglika:  added this to clean the PyTorch cache and free up GPU memory TODO take a course
+        
+        # 2. 0. Model preparation
+        # 2. 1. Set the number of class and GPU usage 
         model = Net(num_classes=4).to(self.device)
+        
+        # 2. 2. Loading the existing model depends on GPU usage
         if self.parameters['use_CPU_only']:
             model.load_state_dict(torch.load('../model/' + self.parameters['model_filename'], map_location=torch.device('cpu')), strict=False)
         else:
             model.load_state_dict(torch.load('../model/' + self.parameters['model_filename']), strict=False)
-
+        
+        # 2. 3. Let the model prepare the evaluation stage
         model.eval()
+        
+        # 3. 0. Inference against each .npy data        
         num_boxes = test_dataset.len()
         with torch.no_grad():
 
@@ -130,36 +142,38 @@ class SemanticSegmentation:
             output_list = []
             for i, data in enumerate(test_loader):
                 if (i % 100) == 0 :
-                    print('\r',str(i * self.parameters['batch_size']),'/', str(num_boxes))
-                data = data.to(self.device)
-                out = model(data)
-                out = out.permute(2, 1, 0).squeeze()
+                    print('\r', str(i * self.parameters['batch_size']),'/', str(num_boxes))
+                data = data.to(self.device) # data will be on GPU computation, this is useless becuase it is already applied under GPU                
+                out = model(data) # This is the moment of inference against for each .npy data
+                out = out.permute(2, 1, 0).squeeze() # The value of tensor can be shown by cli --> 'out[data.batch.cpu()]'
                 batches = np.unique(data.batch.cpu())
                 out = torch.softmax(out.cpu().detach(), axis=1)
                 pos = data.pos.cpu()
-                output = np.hstack((pos, out))
-
+                output = np.hstack((pos, out)) # The value of tensor can be shown by cli --> 'output[data.batch.cpu()]'
+                
                 for batch in batches:
                     outputb = np.asarray(output[data.batch.cpu() == batch])
                     outputb[:, :3] = outputb[:, :3] + np.asarray(data.local_shift.cpu())[3 * batch:3 + (3 * batch)]
                     output_list.append(outputb)
 
-            self.output_point_cloud = np.vstack(output_list)
+            self.output_point_cloud = np.vstack(output_list) # This is the process that the each output from .npy becomes stacked for merging every output.
             print('\r',str(num_boxes),'/',str(num_boxes),'\r')
 
         del outputb, out, batches, pos, output  # clean up anything no longer needed to free RAM.
 
+        # From here, original cloud point data will be loaded to prepare the label properly.
         headers_of_interest = ['x', 'y', 'z','classification','intensity','return_number','gps_time','Ring','Range']
         original_point_cloud, headers = load_file(self.directory + self.filename, headers_of_interest=headers_of_interest)
         # the original point cloud was shifted before the semantic segmentation - shift again for choosing the label
         original_point_cloud[:, :2] = original_point_cloud[:, :2] - self.plot_centre
-        
 
         # Aglika - use NN to find assign segmentation label to the original point cloud
         # self.output_point_cloud is subsampled and labeled and is used to propagate the labels to the original point cloud
         # self.output = choose_most_confident_label(self.output_point_cloud, original_point_cloud[:,:3])  # passing only the important information
                                                                                                         # for memory sake
+        # The moment for predicting labels
         labels = choose_most_confident_label(self.output_point_cloud, original_point_cloud[:,:3])
+        
         self.output = np.hstack((original_point_cloud[:,:3], np.atleast_2d(labels).T))
         self.output = np.hstack((self.output, original_point_cloud[:, 3:]))  # attach back the remaining attributes 
         headers=['x','y','z','label'] + headers[3:]  # list concatenation - HOW AWESOME

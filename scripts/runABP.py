@@ -62,7 +62,7 @@ if __name__ == '__main__':
                           stem_sorting_range=1.2,  # Stem points can be, at most, this far away from a cylinder center in 3D to be matched to a particular tree.
                          
                           # Set these appropriately for your hardware.
-                          batch_size=2,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
+                          batch_size=4,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
                           num_procs=12,  # Number of CPU cores you want to use. If you run out of RAM, lower this.
                           use_CPU_only=False,  # Set to True if you do not have an Nvidia GPU, or if you don't have enough vRAM.
                          
@@ -87,7 +87,7 @@ if __name__ == '__main__':
                           MA_margin=0.30,  # Cylinder measurements within +/- taper_slice_thickness are used for taper measurement at a given height. The largest diameter is used. 
                                             #Aglika - needs a FIX - currently a moving average in the range +-30cm
                           
-                          delete_working_directory=True,  # Generally leave this on. Deletes the files used for segmentation after segmentation is finished. 
+                          delete_working_directory=False,  # Generally leave this on. Deletes the files used for segmentation after segmentation is finished. 
                                                           # You may wish to turn it off if you want to re-run/modify the segmentation code so you don't need to run pre-processing every time.
                           minimise_output_size_mode=1,  # Will not write a few non-essential outputs to reduce storage use.
                           # QC=''  # use QC='_QC' to generate plot reports from QC tables. Will look for {plotID}_QC_data.csv file
@@ -104,11 +104,11 @@ if __name__ == '__main__':
            FSCT(parameters=parameters,
              # Set below to 0 or 1 (or True/False). Each step requires the previous step to have been run already.
              # For standard use, just leave them all set to 1 except "clean_up_files".
-             preprocess   = 1,  # Preparation for semantic segmentation.
+             preprocess   = 0,  # Preparation for semantic segmentation.
              segmentation = 0,  # Deep learning based semantic segmentation of the point cloud.
-             postprocessing=0,  # Creates the DTM and applies some simple rules to clean up the segmented point cloud.
+             postprocessing = 0,  # Creates the DTM and applies some simple rules to clean up the segmented point cloud.
              measure_plot = 0,  # The bulk of the plot measurement happens here.
-             make_report  = 0,  # Generates a plot report, plot map, and some other figures.
+             make_report  = 1,  # Generates a plot report, plot map, and some other figures.
              clean_up_files=0)  # Optionally deletes most of the large point cloud outputs to minimise storage requirements.
 
         except Exception as e:

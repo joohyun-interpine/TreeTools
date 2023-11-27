@@ -19,12 +19,17 @@ import laspy
 import pdfkit
 from copy import deepcopy
 from jinja2 import Environment, FileSystemLoader
+from date_time_modifier import *
+
 
 QC='' # use QC='_QC' to generate plot reports from edited tables. Will look for {plotID}_QC_data.csv file
 # QC='_Field'
-
-
+    
 def make_report(parameters):
+    
+    adjusterObj = DateTimeAdjuster()
+    adjusted_date = adjusterObj.get_adjusted_datetime(parameters['point_cloud_filename'])
+    shorted_date = adjusterObj.shorted_date(adjusted_date)
     
     workdir, plotID = get_output_path(parameters['point_cloud_filename'])        
     filename = plotID + '.laz'        
@@ -51,7 +56,7 @@ def make_report(parameters):
     content = template.render(
         plot_id = plotID,
         filename=filename,
-        scan_date="",
+        scan_date=shorted_date,
         processing_time=f'{int(total_processing_time/60.)}:{int(total_processing_time%60.)}',
         report_summary = report_summary,
         tree_data = tree_data,
@@ -66,7 +71,7 @@ def make_report(parameters):
 
     print("HMTL report done") 
 
-    # wkhtnltopdf 
+    # wkhtnltopdf for converting the html report to pdf
     config = pdfkit.configuration(wkhtmltopdf = "C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe")
     kitoptions = {
         "enable-local-file-access": None
@@ -438,3 +443,5 @@ def customize_data(output_dir, plotID):
     field_df.to_csv(output_dir + plotID + f'_tree_data_report{QC}.csv', index=None, sep=',')
     
     return tree_data
+
+        
