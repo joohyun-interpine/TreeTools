@@ -38,3 +38,12 @@ wkhtmltopdf/include/wkhtmltox/dllbegin.inc
 wkhtmltopdf/include/wkhtmltox/dllend.inc
 wkhtmltopdf/include/wkhtmltox/image.h
 wkhtmltopdf/include/wkhtmltox/pdf.h
+data/LIR184_FT_output/plot_summary.csv
+data/LIR184_FT_output/temp_vegetation.laz
+data/LIR184_FT_output/working_point_cloud.laz
+data/LIR184_FT_output/test/working_point_cloud.laz
+data/LIR184_FT_output/test/Info/working_point_cloud_laz.txt
+data/LIR184_FT_output/ToClient/LIR184_C2_0_0_client.laz
+data/LIR184_FT_output/ToClient/LIR184_C2_0_0_hnom_client.laz
+data/LIR184_FT_output/ToClient/LIR184_segmented_raw_client.laz
+data/LIR184_FT_output/ToClient/LIR184_terrain_points_client.laz

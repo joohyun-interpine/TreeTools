@@ -7,12 +7,21 @@ from post_segmentation_script import PostProcessing
 from measure_work import MeasureTree
 from tools import add_plotid_to_name, clean_output
 import report
+from drop_label_laz import *
 import glob
 import tkinter as tk
 import tkinter.filedialog as fd
 
 
-def FSCT(parameters, preprocess=True, segmentation=True, postprocessing=True, measure_plot=True, make_report=False, clean_up_files=False):
+def FSCT(parameters, 
+         preprocess=True, 
+         segmentation=True, 
+         postprocessing=True, 
+         measure_plot=True, 
+         make_report=False, 
+         nolabel_laz_writer=False, 
+         clean_up_files=False):
+    
     print(parameters['point_cloud_filename'])
 
     if preprocess:
@@ -48,9 +57,16 @@ def FSCT(parameters, preprocess=True, segmentation=True, postprocessing=True, me
         # report_writer = ReportWriter(parameters)
         # report_writer.make_report()          
         # del report_writer
+    
+    if nolabel_laz_writer:
+        laz_writer_obj = LazFileWriter(parameters)            
+        # laz_writer_obj.create_subfolder()
+        # laz_writer_obj.get_laz_contains_label()
+        # laz_writer_obj.is_label_contain_laz()
+        laz_writer_obj.write_laz_file_without_label()
    
-    if  clean_up_files:
-        clean_output(parameters['point_cloud_filename'], parameters['delete_working_directory'])     
+    if clean_up_files:
+        clean_output(parameters['point_cloud_filename'], parameters['delete_working_directory'])
 
 
 def directory_mode(directory=None):
