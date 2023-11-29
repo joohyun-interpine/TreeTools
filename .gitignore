@@ -84,3 +84,7 @@ data/LIR184_FT_output/taper/LIR184_8.csv
 data/LIR184_FT_output/taper/LIR184_9.csv
 data/LIR184_FT_output/taper/LIR184_10.csv
 data/LIR184_FT_output/taper/LIR184_11.csv
+data/LIR184_FT_output/ToClient/LIR184_C2_0_0_hnom.laz
+data/LIR184_FT_output/ToClient/LIR184_C2_0_0.laz
+data/LIR184_FT_output/ToClient/LIR184_segmented_raw.laz
+data/LIR184_FT_output/ToClient/LIR184_terrain_points.laz

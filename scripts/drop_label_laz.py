@@ -2,6 +2,13 @@ import os
 import laspy
 
 class LazFileWriter:
+    """
+    The .laz files that has 'label' info inside, then it will be removed and will be saved as a new .laz data with same name.
+    - This class will investigate the given folder that might have multiple .laz files
+    - When each .laz file contains 'label' info, then it will make a list that have .laz files' paths
+    - Through the for loop with the given list, then if .laz file has 'label' then will remove it and save in under 'ToClient' foler.
+    * This is for delivery to clients    
+    """
     def __init__(self, parameters):
         filename = parameters['point_cloud_filename'].replace('\\', '/')
         directory = os.path.dirname(os.path.realpath(filename)).replace('\\', '/') + '/'             
@@ -15,6 +22,11 @@ class LazFileWriter:
         self.label_contained_laz_list = self.is_label_contain_laz()
 
     def create_subfolder(self):
+        """
+        In order to store the no label contained .laz files, it will create sub folder under project folder.
+        Returns:
+            folder craetion
+        """
         sub_folder_name = 'ToClient'
         client_folder_path = os.path.join(self.parent_path, 'ToClient')
 
@@ -26,6 +38,12 @@ class LazFileWriter:
         return client_folder_path
 
     def get_laz_contains_label(self):
+        """
+        Finding .laz files with the given folder path
+        
+        Returns:
+            list: a list of .laz files under the given folder path
+        """
         all_contents = os.listdir(self.parent_path)
         laz_files = [file for file in all_contents if file.endswith('.laz')]
         laz_file_paths = [os.path.join(self.parent_path, file) for file in laz_files]
@@ -33,6 +51,11 @@ class LazFileWriter:
         return laz_file_paths
 
     def is_label_contain_laz(self):
+        """
+        Finding .laz files that have 'label' info
+        Returns:
+            list: a list of .laz files that have 'label' info
+        """
         label_contained_laz_list = []
 
         for each_laz_file in self.laz_file_paths:
@@ -46,6 +69,9 @@ class LazFileWriter:
         return label_contained_laz_list
 
     def write_laz_file_without_label(self):
+        """
+        Write .laz files without 'label' info
+        """
         for each_laz_file in self.label_contained_laz_list:
             las_file_with_extension = os.path.basename(each_laz_file)
             las_file_without_extension = os.path.splitext(las_file_with_extension)[0]
