@@ -5,7 +5,7 @@ import numpy as np
 import glob
 import pandas as pd
 from preprocessing import Preprocessing
-from model import Net
+from model import Net, Gpu8gbNet
 # from sklearnex import patch_sklearn, config_context
 # patch_sklearn()
 from sklearn.neighbors import NearestNeighbors
@@ -96,7 +96,7 @@ class SemanticSegmentation:
         self.directory = os.path.dirname(os.path.realpath(self.filename)).replace('\\', '/') + '/'
         self.filename = self.filename.split('/')[-1]
         self.filename = self.filename.split('_')[0]
-        self.filename=self.filename.replace('.laz','')
+        self.filename = self.filename.replace('.laz','')
         plotID = self.filename
 
         self.output_dir = self.directory + self.filename + '_FT_output/'
@@ -123,7 +123,8 @@ class SemanticSegmentation:
         
         # 2. 0. Model preparation
         # 2. 1. Set the number of class and GPU usage 
-        model = Net(num_classes=4).to(self.device)
+        # model = Net(num_classes=4).to(self.device) # This os for normal net
+        model = Gpu8gbNet(num_classes=4).to(self.device) # This is for small net
         
         # 2. 2. Loading the existing model depends on GPU usage
         if self.parameters['use_CPU_only']:

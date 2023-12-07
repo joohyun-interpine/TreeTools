@@ -36,7 +36,7 @@ if __name__ == '__main__':
       scan_param_dict = machine_config_obj.mobile_laser_scanning()
 
     for point_cloud_filename in point_clouds_to_process:
-        parameters = client_param_obj.ofo(point_cloud_filename)
+        parameters = client_param_obj.joohyun(point_cloud_filename)
         parameters.update(base_param_obj)
         parameters = parameters | scan_param_dict # Math Union - the second operand overwrites the first!
 

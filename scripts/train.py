@@ -1,17 +1,22 @@
 from tools import load_file, save_file, get_fsct_path
-from model import Net
+from model import Net, Gpu8gbNet
 from train_datasets import TrainingDataset, ValidationDataset
 from fsct_exceptions import NoDataFound
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+torch.cuda.empty_cache()
 from torch_geometric.loader import DataLoader
+# torch.backends.cudnn.benchmark = True
+
 import glob
 import random
 import threading
 import os
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb=8192'
 import shutil
+
 
 # Last reviewed by Perry Han, don't change if you don't understand the code.
 
@@ -59,7 +64,7 @@ class TrainModel:
 
     def preprocessing_setup(self, data_subdirectory): #preprocess point cloud setup (call preprocess_point_cloud function)
         self.check_and_fix_data_directory_structure(data_subdirectory)
-        point_cloud_list = glob.glob(get_fsct_path("data") + "/" + data_subdirectory + "/*.las")
+        point_cloud_list = glob.glob(get_fsct_path("data") + "/" + data_subdirectory + "/*.laz")
         if len(point_cloud_list) > 0:
             print("Preprocessing point clouds set up")
             for point_cloud_file in point_cloud_list:
@@ -249,7 +254,8 @@ class TrainModel:
             )
         
         # Load the model.
-        model = Net(num_classes=5).to(self.device)
+        # model = Net(num_classes=4).to(self.device)
+        model = Gpu8gbNet(num_classes=4).to(self.device)
         if self.parameters["load_existing_model"]:
             print("Loading existing model...")
             try:
@@ -280,6 +286,10 @@ class TrainModel:
         criterion = nn.CrossEntropyLoss()
         val_epoch_loss = 0
         val_epoch_acc = 0
+
+        best_val_acc = 0.0
+        patience = 50  # Set your patience value
+        no_improvement_count = 0  # Initialize counter for consecutive epochs with no improvement
 
         # Train the model.
         for epoch in range(self.parameters["num_epochs"]):
@@ -359,30 +369,39 @@ class TrainModel:
                 val_epoch_loss = running_loss / len(self.validation_loader)
                 val_epoch_acc = running_acc / len(self.validation_loader)
                 self.update_log(epoch, epoch_loss, epoch_acc, val_epoch_loss, val_epoch_acc)
-                print(
-                    "Validation epoch accuracy: ", np.around(val_epoch_acc, 4), ", Loss: ", np.around(val_epoch_loss, 4)
-                )
-                print("=====================================================================")
+                print("Validation epoch accuracy: ", np.around(val_epoch_acc, 4), ", Loss: ", np.around(val_epoch_loss, 4))
+                
+                name, extension = os.path.splitext(self.parameters["model_filename"])
+                saved_model_name = name + '_Epoch' +str(epoch) + '_ValEpochAcc-' + str(round(val_epoch_acc,2)).replace('.', 'p') + extension
+                # Check for improvement in validation accuracy
+                if val_epoch_acc > best_val_acc:
+                    best_val_acc = val_epoch_acc
+                    torch.save(
+                        model.state_dict(),
+                        os.path.join(get_fsct_path("model"), saved_model_name)                        
+                    )
+                    no_improvement_count = 0  # Reset the counter since there is an improvement
+                else:
+                    no_improvement_count += 1
 
-            # Save the model.    
-            torch.save(
-                model.state_dict(),
-                os.path.join(get_fsct_path("model"), self.parameters["model_filename"]),
-            )
-
+                # Early stopping condition
+                if no_improvement_count >= patience:
+                    print(f"No improvement for {patience} consecutive epochs. Early stopping.")
+                    break
+                    
 
 if __name__ == "__main__":
     parameters = dict(
-        preprocess_train_datasets=0, # If 1, the model will preprocess the training datasets. If 0, the model will use the preprocessed training datasets.
-        preprocess_validation_datasets=0, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
+        preprocess_train_datasets=1, # If 1, the model will preprocess the training datasets. If 0, the model will use the preprocessed training datasets.
+        preprocess_validation_datasets=1, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
         clean_sample_directories=0,  # Deletes all samples in the sample directories.
         perform_validation_during_training=1, # If 1, the model will perform validation during training. If 0, the model will only perform validation after training.
         generate_point_cloud_vis=0,  # Useful for visually checking how well the model is learning. Saves a set of samples called "latest_prediction.las" in the "FSCT/data/"" directory. Samples have label and prediction values.
         load_existing_model=0, # If 1, the model will load the model specified in the "model_filename" parameter. If 0, the model will start training from scratch.
-        num_epochs=10, # The number of epochs to train the model for.
+        num_epochs=100, # The number of epochs to train the model for.
         learning_rate=0.000025, # don't change if you don't understand how it will affect the model
         input_point_cloud=None, # If you want to use a custom point cloud, set this to the path of the point cloud. If you want to use the FSCT dataset, set this to None.
-        model_filename="model_branch.pth", # The model will be saved as this filename in the "FSCT/model/" directory.
+        model_filename="DecModel.pth", # The model will be saved as this filename in the "FSCT/model/" directory.
         sample_box_size_m=np.array([6, 6, 6]), # The size of the sample boxes in meters. The model will be trained on these boxes.
         sample_box_overlap=[0.5, 0.5, 0.5], # The overlap between sample boxes. The model will be trained on these boxes.
         min_points_per_box=1000, # The minimum number of points that must be in a sample box for it to be used for training.
@@ -391,7 +410,7 @@ if __name__ == "__main__":
         subsampling_min_spacing=0.025, # The minimum spacing between points in the subsampled point cloud.
         num_cpu_cores_preprocessing=0,  # 0 Means use all available cores.
         num_cpu_cores_deep_learning=0,  # Setting this higher can cause CUDA issues on Windows.
-        train_batch_size=4, # The number of sample boxes that will be used for training at a time.
+        train_batch_size=2, # The number of sample boxes that will be used for training at a time.
         validation_batch_size=2, # The number of sample boxes that will be used for validation at a time.
         device="cuda",  # set to "cuda" or "cpu"
     )

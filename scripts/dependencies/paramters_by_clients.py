@@ -657,3 +657,69 @@ class Parameters:
                           )
         
         return parameters
+    
+    def joohyun(self, point_cloud_filename):
+        """
+        Client: Joo-Hyun Testing, Aka = joohyun
+
+        Args:
+            point_cloud_filename (str): the file name of .laz file
+
+        Returns:
+            dictionary: parameters
+        """
+        parameters = dict(point_cloud_filename=point_cloud_filename,
+                          # Adjust if needed
+                          plot_centre = [0,0],      # [X, Y] Coordinates of the plot centre (metres). If "None", plot_centre is computed based on the point cloud bounding box.
+                          plot_radius = 20,    # If 0 m, the plot is not cropped. Otherwise, the plot is cylindrically cropped from the plot centre with plot_radius + plot_radius_buffer.
+                          plot_radius_buffer = 22.9, # See README. If non-zero, this is used for "Tree Aware Plot Cropping Mode".
+
+                          # DBH height - height above ground to take DBH measurement
+                          dbh_height = 1.3,      # 1.4m for New Zealand, 1.3m for the rest of the world
+                          minimum_DBH = 0.035,  # (metres) trees having DBH smaller than minimum_DBH will be deleted
+                          maximum_DBH = .8,
+                         
+                          bark_sensor_return = "Normal",  # values can be "Dense", "Normal" or "Sparse"
+                                                          # "Dense" for australian Bluegum and mature Redwoods
+                                                          # "Sparse" for young trees and poor semantic segmentation 
+                          # dependant on the size of the trees, forest density and undergrowth height
+                          ground_veg_cutoff_height=.8,  # Any vegetation points below this height are considered to be understory and are not assigned to individual trees.
+                          ground_stem_cutoff_height=.4,  # Any stem points below this height are considered to be understory and are not assigned to individual trees.
+                          veg_sorting_range=2.5,  # Vegetation points can be, at most, this far away from a cylinder horizontally to be matched to a particular tree.
+                          stem_sorting_range=1.2,  # Stem points can be, at most, this far away from a cylinder center in 3D to be matched to a particular tree.
+                         
+                          # Set these appropriately for your hardware.
+                          batch_size=2,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
+                          num_procs=12,  # Number of CPU cores you want to use. If you run out of RAM, lower this.
+                          use_CPU_only=False,  # Set to True if you do not have an Nvidia GPU, or if you don't have enough vRAM.
+                         
+                          # Optional settings - Generally leave as they are. Speed vs accuracy.
+                          slice_thickness=0.15,  # thickness of point cloud slice to be used for finding clusters
+                          # If your point cloud is really dense, you may get away with 0.1.
+                          slice_increment=0.1,  # Distance between slices
+                          single_increment_height = 10, # doubled increment is used above this height to save time
+
+                          # denoise_stem_points = True, # if True, stem points of Height<5 AND Range>11 will be discarded
+                                                      # Also, this parameter is used as a denoising flag during preprocessing
+                          sort_stems=1,  # If you don't need the sorted stem points, turning this off speeds things up.
+                                         # Veg sorting is required for tree height measurement, but stem sorting isn't necessary for standard use.
+
+                          generate_output_point_cloud=1,  # Turn on if you would like a semantic and instance segmented point cloud. This mode will override the "sort_stems" setting if on.
+                                                          # If you activate "tree aware plot cropping mode", this function will use it.
+                           
+                          # taper measurement
+                          taper_measurement_height_min=.5,  # Lowest height to measure diameter for taper output.
+                          taper_measurement_height_max=50,  # Highest height to measure diameter for taper output.
+                          taper_measurement_height_increment=0.1,  # diameter measurement increment. #Aglika - always uses 0 as a start point - needs a FIX - done
+                          MA_margin=0.30,  # Cylinder measurements within +/- taper_slice_thickness are used for taper measurement at a given height. The largest diameter is used. 
+                                            #Aglika - needs a FIX - currently a moving average in the range +-30cm
+                          
+                          delete_working_directory=False,  # Generally leave this on. Deletes the files used for segmentation after segmentation is finished. 
+                                                          # You may wish to turn it off if you want to re-run/modify the segmentation code so you don't need to run pre-processing every time.
+                          minimise_output_size_mode=1,  # Will not write a few non-essential outputs to reduce storage use.
+                          # QC=''  # use QC='_QC' to generate plot reports from QC tables. Will look for {plotID}_QC_data.csv file
+                          split_by_tree = False, # if True, outputs a las file for each detected tree in the plot (outputs to the 'taper' directory)
+                          dbh_correction_mm = 0  # default = 0
+                          )
+        
+        return parameters

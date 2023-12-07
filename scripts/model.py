@@ -88,3 +88,38 @@ class Net(torch.nn.Module):
         x = self.conv2(x)
         x = F.log_softmax(x, dim=1)
         return x
+
+
+class Gpu8gbNet(torch.nn.Module):
+    def __init__(self, num_classes):
+        super(Gpu8gbNet, self).__init__()
+        self.sa1_module = SAModule(0.1, 0.2, MLP([3, 8, 16, 32]))
+        self.sa2_module = SAModule(0.05, 0.4, MLP([32 + 3, 32, 64, 64]))
+        self.sa3_module = GlobalSAModule(MLP([64 + 3, 64, 128, 128]))
+
+        self.fp3_module = FPModule(1, MLP([192, 64, 64]))
+        self.fp2_module = FPModule(3, MLP([96, 64, 64]))
+        self.fp1_module = FPModule(3, MLP([64, 64, 64]))
+
+        self.conv1 = torch.nn.Conv1d(64, 64, 1)
+        self.conv2 = torch.nn.Conv1d(64, num_classes, 1)
+        self.drop1 = torch.nn.Dropout(0.5)
+        self.bn1 = torch.nn.BatchNorm1d(64)
+
+    def forward(self, data):
+        sa0_out = (data.x, data.pos, data.batch)
+        sa1_out = self.sa1_module(*sa0_out)
+        sa2_out = self.sa2_module(*sa1_out)
+        sa3_out = self.sa3_module(*sa2_out)
+
+        fp3_out = self.fp3_module(*sa3_out, *sa2_out)
+        fp2_out = self.fp2_module(*fp3_out, *sa1_out)
+        x, _, _ = self.fp1_module(*fp2_out, *sa0_out)
+
+        # torch.cuda.empty_cache()
+        x = x.unsqueeze(dim=0)
+        x = x.permute(0, 2, 1)
+        x = self.drop1(F.relu(self.bn1(self.conv1(x))))
+        x = self.conv2(x)
+        x = F.log_softmax(x, dim=1)
+        return x
