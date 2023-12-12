@@ -417,8 +417,8 @@ def set_params():
     return parameters
     
 if __name__ == "__main__":
-    dataPreObj = DataPrep()
-    dataPreObj.removing_ambigous_area()
-    # parameters = set_params()
-    # run_training = TrainModel(parameters)
-    # run_training.run_training()
+    # dataPreObj = DataPrep()
+    # dataPreObj.removing_ambigous_area()
+    parameters = set_params()
+    run_training = TrainModel(parameters)
+    run_training.run_training()
