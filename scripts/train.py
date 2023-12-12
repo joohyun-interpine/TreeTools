@@ -9,7 +9,7 @@ import torch.optim as optim
 torch.cuda.empty_cache()
 from torch_geometric.loader import DataLoader
 # torch.backends.cudnn.benchmark = True
-
+from datapreparation.data_preparation import DataPrep
 import glob
 import random
 import threading
@@ -389,31 +389,36 @@ class TrainModel:
                     print(f"No improvement for {patience} consecutive epochs. Early stopping.")
                     break
                     
-
-if __name__ == "__main__":
+def set_params():
     parameters = dict(
-        preprocess_train_datasets=1, # If 1, the model will preprocess the training datasets. If 0, the model will use the preprocessed training datasets.
-        preprocess_validation_datasets=1, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
-        clean_sample_directories=0,  # Deletes all samples in the sample directories.
-        perform_validation_during_training=1, # If 1, the model will perform validation during training. If 0, the model will only perform validation after training.
-        generate_point_cloud_vis=0,  # Useful for visually checking how well the model is learning. Saves a set of samples called "latest_prediction.las" in the "FSCT/data/"" directory. Samples have label and prediction values.
-        load_existing_model=0, # If 1, the model will load the model specified in the "model_filename" parameter. If 0, the model will start training from scratch.
-        num_epochs=100, # The number of epochs to train the model for.
-        learning_rate=0.000025, # don't change if you don't understand how it will affect the model
-        input_point_cloud=None, # If you want to use a custom point cloud, set this to the path of the point cloud. If you want to use the FSCT dataset, set this to None.
-        model_filename="DecModel.pth", # The model will be saved as this filename in the "FSCT/model/" directory.
-        sample_box_size_m=np.array([6, 6, 6]), # The size of the sample boxes in meters. The model will be trained on these boxes.
-        sample_box_overlap=[0.5, 0.5, 0.5], # The overlap between sample boxes. The model will be trained on these boxes.
-        min_points_per_box=1000, # The minimum number of points that must be in a sample box for it to be used for training.
-        max_points_per_box=200000, # The maximum number of points that can be in a sample box for it to be used for training.
-        subsample=False, # If True, the model will subsample the point cloud before training. This can speed up training, but can also reduce accuracy.
-        subsampling_min_spacing=0.025, # The minimum spacing between points in the subsampled point cloud.
-        num_cpu_cores_preprocessing=0,  # 0 Means use all available cores.
-        num_cpu_cores_deep_learning=0,  # Setting this higher can cause CUDA issues on Windows.
-        train_batch_size=2, # The number of sample boxes that will be used for training at a time.
-        validation_batch_size=2, # The number of sample boxes that will be used for validation at a time.
-        device="cuda",  # set to "cuda" or "cpu"
+    preprocess_train_datasets=1, # If 1, the model will preprocess the training datasets. If 0, the model will use the preprocessed training datasets.
+    preprocess_validation_datasets=1, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
+    clean_sample_directories=0,  # Deletes all samples in the sample directories.
+    perform_validation_during_training=1, # If 1, the model will perform validation during training. If 0, the model will only perform validation after training.
+    generate_point_cloud_vis=0,  # Useful for visually checking how well the model is learning. Saves a set of samples called "latest_prediction.las" in the "FSCT/data/"" directory. Samples have label and prediction values.
+    load_existing_model=0, # If 1, the model will load the model specified in the "model_filename" parameter. If 0, the model will start training from scratch.
+    num_epochs=100, # The number of epochs to train the model for.
+    learning_rate=0.000025, # don't change if you don't understand how it will affect the model
+    input_point_cloud=None, # If you want to use a custom point cloud, set this to the path of the point cloud. If you want to use the FSCT dataset, set this to None.
+    model_filename="DecModel.pth", # The model will be saved as this filename in the "FSCT/model/" directory.
+    sample_box_size_m=np.array([6, 6, 6]), # The size of the sample boxes in meters. The model will be trained on these boxes.
+    sample_box_overlap=[0.5, 0.5, 0.5], # The overlap between sample boxes. The model will be trained on these boxes.
+    min_points_per_box=1000, # The minimum number of points that must be in a sample box for it to be used for training.
+    max_points_per_box=200000, # The maximum number of points that can be in a sample box for it to be used for training.
+    subsample=False, # If True, the model will subsample the point cloud before training. This can speed up training, but can also reduce accuracy.
+    subsampling_min_spacing=0.025, # The minimum spacing between points in the subsampled point cloud.
+    num_cpu_cores_preprocessing=0,  # 0 Means use all available cores.
+    num_cpu_cores_deep_learning=0,  # Setting this higher can cause CUDA issues on Windows.
+    train_batch_size=2, # The number of sample boxes that will be used for training at a time.
+    validation_batch_size=2, # The number of sample boxes that will be used for validation at a time.
+    device="cuda",  # set to "cuda" or "cpu"
     )
-
-    run_training = TrainModel(parameters)
-    run_training.run_training()
+    
+    return parameters
+    
+if __name__ == "__main__":
+    dataPreObj = DataPrep()
+    dataPreObj.removing_ambigous_area()
+    # parameters = set_params()
+    # run_training = TrainModel(parameters)
+    # run_training.run_training()

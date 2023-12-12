@@ -279,6 +279,9 @@ class DataSelection:
 
         return folder_paths[1]
     
+    
+########### If you want to use this script separately from the data_praparation.py then, uncomment the below lines ################
+
 # def main():
 #     path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_PlayGroundSet\data_selection'
 #     dsObj = DataSelection(path)    

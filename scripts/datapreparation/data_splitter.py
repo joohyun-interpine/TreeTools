@@ -170,6 +170,9 @@ class DataSplitter:
             out_las.write(nonlabelled_laz_output_file_path)
             print("Nonlabelled .laz file created:", nonlabelled_laz_output_file_path)
 
+
+########### If you want to use this script separately from the data_praparation.py then, uncomment the below lines ################
+
 # def main():
 #     lassplit_path = r'C:\LAStools\bin\lassplit.exe'
 #     path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_PlayGroundSet\data_splitter\LIR42_C2_0_0.laz'
