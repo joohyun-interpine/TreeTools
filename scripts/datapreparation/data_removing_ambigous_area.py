@@ -25,7 +25,7 @@ class DataRemovingAmbigousArea:
         self.fileextension = os.path.splitext(os.path.split(self.path)[1])[-1]
                
         
-    def get_data(self, canopy = 2, stem = 4):
+    def get_data(self, canopy = 1, stem = 3):
         """
         From .laz file, 
         - total z values which are heights values will be extracted as a numpy array

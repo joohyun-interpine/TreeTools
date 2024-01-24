@@ -30,7 +30,7 @@ class DataSelection:
         return las_laz_list
     
     
-    def get_stem_proportion(self, laspy_obj):
+    def get_stem_proportion(self, laspy_obj, stem_cls = 3):
         """
         Counting the number of points of each class from the 'label' axis which is the last dimesion of the 3d point cloud numpy array.
         Once the number of classes has been counted, then it will be stored in a dictionary with itw own path and proportion of it.
@@ -43,7 +43,7 @@ class DataSelection:
         label_axis_values = laspy_obj.label
         unique_values, counts = np.unique(label_axis_values, return_counts=True)
         counted_class = dict(zip(unique_values, counts))
-        stem_class_count = counted_class[4]
+        stem_class_count = counted_class[stem_cls]
         entire_class_count = sum(counted_class.values())
         stem_proportion = stem_class_count / entire_class_count        
             
@@ -143,7 +143,7 @@ class DataSelection:
                 label_uncontained_laz_list.append(las_laz_file)
                 
         
-            stem_proportion = self.get_stem_proportion(laspy_obj)      
+            stem_proportion = self.get_stem_proportion(laspy_obj, stem_cls = 3)
             file_stem_dict[las_laz_file] = stem_proportion       
         
         print("Total {} does have label info out of {} data".format(len(label_contained_laz_list), len(las_laz_list)))
@@ -280,17 +280,17 @@ class DataSelection:
         return folder_paths[1]
     
     
-########### If you want to use this script separately from the data_praparation.py then, uncomment the below lines ################
+########## If you want to use this script separately from the data_praparation.py then, uncomment the below lines ################
 
-# def main():
-#     path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_PlayGroundSet\data_selection'
-#     dsObj = DataSelection(path)    
-#     las_laz_list = dsObj.get_las_laz_list()
-#     file_stem_dict = dsObj.has_label_or_not(las_laz_list)
-#     higher_stem_proportion_data = dsObj.get_over_median_stem_proportion_data(file_stem_dict)    
-#     dsObj.create_dataset_dir(train='train', val='validation', test='test')
-#     dsObj.is_outlier_xyz(higher_stem_proportion_data)
-    
+def main():
+    path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_TrainingSet\Train_Dataset\Train_Dataset_Classified\Sample_data'
+    dsObj = DataSelection(path)    
+    las_laz_list = dsObj.get_las_laz_list()
+    file_stem_dict = dsObj.has_label_or_not(las_laz_list)
+    higher_stem_proportion_data = dsObj.get_over_median_stem_proportion_data(file_stem_dict)    
+    dsObj.create_selected_dir(selected = 'selected', discarded = 'discarded')
+    selected_folder_path = dsObj.data_cut_paste(higher_stem_proportion_data) 
+
  
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()

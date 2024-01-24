@@ -92,16 +92,16 @@ class DataPrep:
         
 def main():
     
-    folder_path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_PlayGroundSet\removing_ambigous_area'
+    folder_path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_TrainingSet\Train_Dataset\Train_DataSet_Normal'
     lassplit_path = r'C:\LAStools\bin\lassplit.exe'
     las2las_path = r'C:\LAStools\bin\las2las.exe'
-    
+    selected_folder_path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_TrainingSet\Train_Dataset\ThreePlots'
     dpobj = DataPrep(folder_path)
     
-    unique_nominated_folder_path, unique_dropped_folder_path = dpobj.removing_ambigous_area(las2las_path)
-    print("Removing ambogous area is completed, and data selection will be started")   
-    selected_folder_path = dpobj.get_high_stem_laz(unique_nominated_folder_path) 
-    print("Data selection is completed, and data splitting will be started")   
+    # unique_nominated_folder_path, unique_dropped_folder_path = dpobj.removing_ambigous_area(las2las_path)
+    # print("Removing ambogous area is completed, and data selection will be started")   
+    # selected_folder_path = dpobj.get_high_stem_laz(unique_nominated_folder_path) 
+    # print("Data selection is completed, and data splitting will be started")   
     dpobj.data_split(lassplit_path, selected_folder_path)
     print("Data splitting is completed, now training can be started")
     

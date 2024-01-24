@@ -171,18 +171,18 @@ class DataSplitter:
             print("Nonlabelled .laz file created:", nonlabelled_laz_output_file_path)
 
 
-########### If you want to use this script separately from the data_praparation.py then, uncomment the below lines ################
+########## If you want to use this script separately from the data_praparation.py then, uncomment the below lines ################
 
-# def main():
-#     lassplit_path = r'C:\LAStools\bin\lassplit.exe'
-#     path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_PlayGroundSet\data_splitter\LIR42_C2_0_0.laz'
-#     dsObj = DataSplitter(path) 
-#     dataset_boundaries = dsObj.get_boundaries()
-#     subfolder_list = dsObj.cmd_executor(lassplit_path, dataset_boundaries)
-#     dsObj.create_nonlabelled_test_laz(subfolder_list)
+def main():
+    lassplit_path = r'C:\LAStools\bin\lassplit.exe'
+    path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_PlayGroundSet\data_splitter\LIR42_C2_0_0.laz'
+    dsObj = DataSplitter(path) 
+    dataset_boundaries = dsObj.get_boundaries()
+    subfolder_list = dsObj.cmd_executor(lassplit_path, dataset_boundaries)
+    dsObj.create_nonlabelled_test_laz(subfolder_list)
     
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
 
 
     

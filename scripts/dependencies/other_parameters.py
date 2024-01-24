@@ -10,8 +10,8 @@ class BaseParameters:
         pass         
     
     def other_parameters(self):
-            other_parameters = dict(model_filename='DecModel_Epoch1_ValEpochAcc-0p61.pth',
-                                    # model_filename='model_original.pth',
+            other_parameters = dict(model_filename='C:\RemoteSensing\MLS\TreeTools\model\model_original.pth',                                    
+                                    # model_filename='C:\RemoteSensing\MLS\TreeTools\model\FC_branch_4classes_Epoch904_ValEpochAcc-0p71.pth',
                             box_dimensions=[6, 6, 6],  # Dimensions of the sliding box used for semantic segmentation. # Joo-Hyun Testing
                             # box_dimensions=[4,4,10],
                             # box_dimensions=[1,1,1],
@@ -19,8 +19,8 @@ class BaseParameters:
                             box_overlap=[0.5, 0.5, 0.5],  # Overlap of the sliding box used for semantic segmentation.
                             # box_overlap=[0.5, 0.5, 0.5],
                             min_points_per_box=1000,  # Minimum number of points for input to the model. Too few points and it becomes near impossible to accurately label them (though assuming vegetation class is the safest bet here).
-                            # max_points_per_box=20000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
-                            max_points_per_box=200000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
+                            max_points_per_box=20000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
+                            # max_points_per_box=200000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
                             noise_class=0,  # Don't change
                             terrain_class=1,  # Don't change
                             vegetation_class=2,  # Don't change

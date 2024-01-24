@@ -170,7 +170,7 @@ class Parameters:
                           stem_sorting_range=1.2,  # Stem points can be, at most, this far away from a cylinder center in 3D to be matched to a particular tree.
                          
                           # Set these appropriately for your hardware.
-                          batch_size=4,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
+                          batch_size=2,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
                           num_procs=12,  # Number of CPU cores you want to use. If you run out of RAM, lower this.
                           use_CPU_only=False,  # Set to True if you do not have an Nvidia GPU, or if you don't have enough vRAM.
                          
@@ -671,8 +671,8 @@ class Parameters:
         parameters = dict(point_cloud_filename=point_cloud_filename,
                           # Adjust if needed
                           plot_centre = [0,0],      # [X, Y] Coordinates of the plot centre (metres). If "None", plot_centre is computed based on the point cloud bounding box.
-                          plot_radius = 20,    # If 0 m, the plot is not cropped. Otherwise, the plot is cylindrically cropped from the plot centre with plot_radius + plot_radius_buffer.
-                          plot_radius_buffer = 22.9, # See README. If non-zero, this is used for "Tree Aware Plot Cropping Mode".
+                          plot_radius = 13.82,    # If 0 m, the plot is not cropped. Otherwise, the plot is cylindrically cropped from the plot centre with plot_radius + plot_radius_buffer.
+                          plot_radius_buffer = 1.9, # See README. If non-zero, this is used for "Tree Aware Plot Cropping Mode".
 
                           # DBH height - height above ground to take DBH measurement
                           dbh_height = 1.3,      # 1.4m for New Zealand, 1.3m for the rest of the world
@@ -689,7 +689,7 @@ class Parameters:
                           stem_sorting_range=1.2,  # Stem points can be, at most, this far away from a cylinder center in 3D to be matched to a particular tree.
                          
                           # Set these appropriately for your hardware.
-                          batch_size=2,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
+                          batch_size=4,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
                           num_procs=12,  # Number of CPU cores you want to use. If you run out of RAM, lower this.
                           use_CPU_only=False,  # Set to True if you do not have an Nvidia GPU, or if you don't have enough vRAM.
                          

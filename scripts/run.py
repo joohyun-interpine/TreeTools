@@ -47,10 +47,10 @@ if __name__ == '__main__':
              # For standard use, just leave them all set to 1 except "clean_up_files".
              preprocess   = 1,  # Preparation for semantic segmentation.
              segmentation = 1,  # Deep learning based semantic segmentation of the point cloud.
-             postprocessing = 1,  # Creates the DTM and applies some simple rules to clean up the segmented point cloud.
-             measure_plot = 1,  # The bulk of the plot measurement happens here.
-             make_report  = 1,  # Generates a plot report, plot map, and some other figures.
-             nolabel_laz_writer = 1, # Write the .laz files under 'ToClient' folder that do not have label info.
+             postprocessing = 0,  # Creates the DTM and applies some simple rules to clean up the segmented point cloud.
+             measure_plot = 0,  # The bulk of the plot measurement happens here.
+             make_report  = 0,  # Generates a plot report, plot map, and some other figures.
+             nolabel_laz_writer = 0, # Write the .laz files under 'ToClient' folder that do not have label info.
              clean_up_files=0)  # Optionally deletes most of the large point cloud outputs to minimise storage requirements.
 
         except Exception as e:

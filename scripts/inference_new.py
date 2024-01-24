@@ -123,14 +123,15 @@ class SemanticSegmentation:
         
         # 2. 0. Model preparation
         # 2. 1. Set the number of class and GPU usage 
-        # model = Net(num_classes=4).to(self.device) # This os for normal net
-        model = Gpu8gbNet(num_classes=4).to(self.device) # This is for small net
+        model = Net(num_classes=4).to(self.device) # This os for normal net
+        # model = Gpu8gbNet(num_classes=4).to(self.device) # This is for small net
         
         # 2. 2. Loading the existing model depends on GPU usage
         if self.parameters['use_CPU_only']:
             model.load_state_dict(torch.load('../model/' + self.parameters['model_filename'], map_location=torch.device('cpu')), strict=False)
         else:
-            model.load_state_dict(torch.load('../model/' + self.parameters['model_filename']), strict=False)
+            # model.load_state_dict(torch.load('../model/' + self.parameters['model_filename']), strict=False)
+            model.load_state_dict(torch.load(self.parameters['model_filename']), strict=False)
         
         # 2. 3. Let the model prepare the evaluation stage
         model.eval()
