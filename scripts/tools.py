@@ -131,24 +131,24 @@ def subsample_point_cloud(pointcloud, min_spacing, num_procs=1):
     print("Number of points after subsampling:", pointcloud.shape[0])
     return pointcloud
 
-
+# # For backup (modify version) ------------------------------------------ x, y, z, Range, intensity added
 def load_file(filename, plot_centre=None, plot_radius=0, plot_radius_buffer=0, silent=False, headers_of_interest=None, return_num_points=False):    
     if headers_of_interest is None:
         headers_of_interest = []
     if not silent:
         print('Loading file...', filename)
     file_extension = filename[-4:]
-    coord_headers = ['x', 'y', 'z']
+    coord_headers = ['x', 'y', 'z', 'Range', 'intensity']
     output_headers = []
     
     if file_extension == '.las' or file_extension == '.laz':
         inFile = laspy.read(filename)
         header_names = list(inFile.point_format.dimension_names)
         # print(header_names)
-        pointcloud = np.vstack((inFile.x, inFile.y, inFile.z))
+        pointcloud = np.vstack((inFile.x, inFile.y, inFile.z, inFile.Range, inFile.intensity))
         #pointcloud = np.vstack((inFile.X, inFile.Y, inFile.Z))     # Aglika - TODO Change to integer computations for coordinates 
         if len(headers_of_interest) != 0:
-            headers_of_interest = headers_of_interest[3:] # Get lid of the xyz co-ordinates, then remains the other infos
+            headers_of_interest = headers_of_interest[5:] # Get lid of the xyz co-ordinates, then remains the other infos
             for header in headers_of_interest:
                 if header in header_names:
                     pointcloud = np.vstack((pointcloud, getattr(inFile, header)))
@@ -175,6 +175,123 @@ def load_file(filename, plot_centre=None, plot_radius=0, plot_radius_buffer=0, s
     else:
         return pointcloud, coord_headers + output_headers
 
+# # For backup (original version) ------------------------------------------ x, y, z only
+# def load_file(filename, plot_centre=None, plot_radius=0, plot_radius_buffer=0, silent=False, headers_of_interest=None, return_num_points=False):    
+#     if headers_of_interest is None:
+#         headers_of_interest = []
+#     if not silent:
+#         print('Loading file...', filename)
+#     file_extension = filename[-4:]
+#     coord_headers = ['x', 'y', 'z']
+#     output_headers = []
+    
+#     if file_extension == '.las' or file_extension == '.laz':
+#         inFile = laspy.read(filename)
+#         header_names = list(inFile.point_format.dimension_names)
+#         # print(header_names)
+#         pointcloud = np.vstack((inFile.x, inFile.y, inFile.z))
+#         #pointcloud = np.vstack((inFile.X, inFile.Y, inFile.Z))     # Aglika - TODO Change to integer computations for coordinates 
+#         if len(headers_of_interest) != 0:
+#             headers_of_interest = headers_of_interest[3:] # Get lid of the xyz co-ordinates, then remains the other infos
+#             for header in headers_of_interest:
+#                 if header in header_names:
+#                     pointcloud = np.vstack((pointcloud, getattr(inFile, header)))
+#                     output_headers.append(header)
+
+#         pointcloud = pointcloud.transpose()
+
+#     elif file_extension == '.csv':
+#         pointcloud = np.array(pd.read_csv(filename, header=None, index_col=None, delim_whitespace=True))
+
+#     original_num_points = pointcloud.shape[0]
+
+#     if plot_centre is None:
+#         mins = np.min(pointcloud[:, :2], axis=0)
+#         maxes = np.max(pointcloud[:, :2], axis=0)
+#         plot_centre = (maxes+mins)/2
+
+#     if plot_radius > 0:
+#         distances = np.linalg.norm(pointcloud[:, :2] - plot_centre, axis=1)
+#         keep_points = distances < plot_radius + plot_radius_buffer
+#         pointcloud = pointcloud[keep_points]
+#     if return_num_points:
+#         return pointcloud, coord_headers + output_headers, original_num_points
+#     else:
+#         return pointcloud, coord_headers + output_headers
+    
+# # Saving point cloud into file writing all non-zero attributes from headers_of_interest
+# def save_file(filename, pointcloud, headers_of_interest=None, silent=False, offsets=[0,0,0]):
+#     if headers_of_interest is None:
+#         headers_of_interest = []
+
+#     if pointcloud.shape[0] == 0:
+#         print(filename, 'is empty...')
+#         return 1
+#     else:
+#         if not silent:
+#             print('Saving file:', filename)
+#         if filename[-4:] == '.laz':
+#             las = laspy.create(file_version="1.4", point_format=7)
+#             las.header.global_encoding.value = 17       # see LAS specification
+#             # f = open(filename, "rb+")
+#             # f.seek(6)
+#             # f.write(bytes([17, 0, 0, 0]));
+
+#             las.header.point_count = pointcloud.shape[0]
+#             las.header.offsets = offsets
+#             las.header.scales = [0.001, 0.001, 0.001]   # asssign scales before assigning coordinates
+#                                                         # ow: coordinates will be scaled with 10^-1 ?!
+#             las.x = pointcloud[:, 0]
+#             las.y = pointcloud[:, 1]
+#             las.z = pointcloud[:, 2]
+
+#             skip=3 # the headers of interest must be called in the right order to match the right column in the np array
+#             headers_of_interest = headers_of_interest[skip:]
+#             for hdr in headers_of_interest :
+#                 index = headers_of_interest.index(hdr) + skip
+#                 # Check for non-zero and if not move to the next header item
+#                 if not np.any(pointcloud[:, index]): 
+#                     index+=1
+#                     continue
+#                 # save atributes according file_version and point_format
+#                 if hdr in ['red', 'green', 'blue']:
+#                     setattr(las, hdr, pointcloud[:,index])
+#                 elif hdr in ['intensity','return_number','gps_time','classification'] :
+#                     las[hdr] = pointcloud[:, index]   # this works for dimensions defined in the type of las file
+#                 else :
+                    
+#                     if hdr == 'Ring' :    
+#                         las.add_extra_dim(laspy.ExtraBytesParams(name=hdr, type='u1', description="Lidar Ring in Velodyne"))             
+#                         las.Ring = pointcloud[:,index]                        
+#                     elif hdr == 'Range' :
+#                         las.add_extra_dim(laspy.ExtraBytesParams(name=hdr, type='f4', description="Range from Lidar to Point"))             
+#                         las.Range = pointcloud[:,index]
+#                     else :
+#                         if hdr in ['label', 'CCI']:
+#                             dimtype='u1'
+#                             # las.add_extra_dim(laspy.ExtraBytesParams(name=hdr, type='u1'))
+#                         elif hdr == 'tree_id' :
+#                             dimtype= 'i2'
+#                         else : # height_above_dtm, CCI, segment_angle, Vx, Vy, Vz, tree_id
+#                             dimtype = 'f4'
+                            
+#                         las.add_extra_dim(laspy.ExtraBytesParams(name=hdr, type=dimtype))
+#                         setattr(las, hdr, pointcloud[:,index])                                    
+                
+#                 index +=1
+#                 if index == pointcloud.shape[1] : break 
+           
+#             las.write(filename)
+            
+#             if not silent:
+#                 print("Saved.")
+
+#         elif filename[-4:] == '.csv':
+#             pd.DataFrame(pointcloud).to_csv(filename, header=None, index=None, sep=' ')
+#             print("Saved to:", filename)
+    
+#     return 0
+
 # Saving point cloud into file writing all non-zero attributes from headers_of_interest
 def save_file(filename, pointcloud, headers_of_interest=None, silent=False, offsets=[0,0,0]):
     if headers_of_interest is None:
@@ -200,8 +317,10 @@ def save_file(filename, pointcloud, headers_of_interest=None, silent=False, offs
             las.x = pointcloud[:, 0]
             las.y = pointcloud[:, 1]
             las.z = pointcloud[:, 2]
+            las.Range = pointcloud[:, 3]
+            las.intensity = pointcloud[:, 4]
 
-            skip=3 # the headers of interest must be called in the right order to match the right column in the np array
+            skip=5 # the headers of interest must be called in the right order to match the right column in the np array
             headers_of_interest = headers_of_interest[skip:]
             for hdr in headers_of_interest :
                 index = headers_of_interest.index(hdr) + skip
@@ -247,7 +366,6 @@ def save_file(filename, pointcloud, headers_of_interest=None, silent=False, offs
             print("Saved to:", filename)
     
     return 0
-
 
 def get_heights_above_DTM(points, DTM):
     # *** points is at least a 4-column array of type x,y,z,...,dtm_place_holder
