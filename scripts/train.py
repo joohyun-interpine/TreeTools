@@ -9,7 +9,7 @@ import torch.optim as optim
 torch.cuda.empty_cache()
 from torch_geometric.loader import DataLoader
 # torch.backends.cudnn.benchmark = True
-from datapreparation.data_preparation import DataPrep
+# from datapreparation.data_preparation import DataPrep
 import glob
 import random
 import threading
@@ -61,7 +61,9 @@ class TrainModel:
 
             else:
                 print(directory, "directory found.")
-
+    
+    
+    # # For backup (modify version) ------------------------------------------ x, y, z, Range, intensity added
     def preprocessing_setup(self, data_subdirectory): #preprocess point cloud setup (call preprocess_point_cloud function)
         self.check_and_fix_data_directory_structure(data_subdirectory)
         point_cloud_list = glob.glob(get_fsct_path("data") + "/" + data_subdirectory + "/*.laz")
@@ -69,9 +71,20 @@ class TrainModel:
             print("Preprocessing point clouds set up")
             for point_cloud_file in point_cloud_list:
                 print(point_cloud_file)
-                point_cloud, headers = load_file(point_cloud_file, headers_of_interest=["x", "y", "z", "label"])
+                point_cloud, headers = load_file(point_cloud_file, headers_of_interest=["x", "y", "z", "Range", "intensity", "label"])
                 self.preprocess_point_cloud(point_cloud, get_fsct_path("data") + "/" + data_subdirectory + "/sample_dir/")
-
+                
+    # # For backup (origin version) ------------------------------------------ xyz only
+    # def preprocessing_setup(self, data_subdirectory): #preprocess point cloud setup (call preprocess_point_cloud function)
+    #     self.check_and_fix_data_directory_structure(data_subdirectory)
+    #     point_cloud_list = glob.glob(get_fsct_path("data") + "/" + data_subdirectory + "/*.laz")
+    #     if len(point_cloud_list) > 0:
+    #         print("Preprocessing point clouds set up")
+    #         for point_cloud_file in point_cloud_list:
+    #             print(point_cloud_file)
+    #             point_cloud, headers = load_file(point_cloud_file, headers_of_interest=["x", "y", "z", "label"])
+    #             self.preprocess_point_cloud(point_cloud, get_fsct_path("data") + "/" + data_subdirectory + "/sample_dir/")
+                
     @staticmethod
     def threaded_boxes(point_cloud, box_size, min_points_per_box, max_points_per_box, path, id_offset, point_divisions): #split point cloud into boxes and save them as numpy arrays
         box_size = np.array(box_size)
@@ -391,8 +404,8 @@ class TrainModel:
                     
 def set_params():
     parameters = dict(
-    preprocess_train_datasets=1, # If 1, the model will preprocess the training datasets. If 0, the model will use the preprocessed training datasets.
-    preprocess_validation_datasets=1, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
+    preprocess_train_datasets=0, # If 1, the model will preprocess the training datasets. If 0, the model will use the preprocessed training datasets.
+    preprocess_validation_datasets=0, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
     clean_sample_directories=0,  # Deletes all samples in the sample directories.
     perform_validation_during_training=1, # If 1, the model will perform validation during training. If 0, the model will only perform validation after training.
     generate_point_cloud_vis=0,  # Useful for visually checking how well the model is learning. Saves a set of samples called "latest_prediction.las" in the "FSCT/data/"" directory. Samples have label and prediction values.

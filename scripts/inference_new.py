@@ -5,7 +5,7 @@ import numpy as np
 import glob
 import pandas as pd
 from preprocessing import Preprocessing
-from model import Net, Gpu8gbNet
+from model import Net
 # from sklearnex import patch_sklearn, config_context
 # patch_sklearn()
 from sklearn.neighbors import NearestNeighbors

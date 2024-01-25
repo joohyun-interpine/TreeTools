@@ -18,10 +18,12 @@ class Parameters:
         """
         parameters = dict(point_cloud_filename=point_cloud_filename,
                           # Adjust if needed
+                        #   plot_centre=[0,0],      # [X, Y] Coordinates of the plot centre (metres). If "None", plot_centre is computed based on the point cloud bounding box.
+                        #   plot_radius = 14.1,    # If 0 m, the plot is not cropped. Otherwise, the plot is cylindrically cropped from the plot centre with plot_radius + plot_radius_buffer.
+                        #   plot_radius_buffer=2.9, # See README. If non-zero, this is used for "Tree Aware Plot Cropping Mode".
                           plot_centre=[0,0],      # [X, Y] Coordinates of the plot centre (metres). If "None", plot_centre is computed based on the point cloud bounding box.
-                          plot_radius = 14.1,    # If 0 m, the plot is not cropped. Otherwise, the plot is cylindrically cropped from the plot centre with plot_radius + plot_radius_buffer.
-                          plot_radius_buffer=2.9, # See README. If non-zero, this is used for "Tree Aware Plot Cropping Mode".
-
+                          plot_radius = 10,    # If 0 m, the plot is not cropped. Otherwise, the plot is cylindrically cropped from the plot centre with plot_radius + plot_radius_buffer.
+                          plot_radius_buffer=1, # See README. If non-zero, this is used for "Tree Aware Plot Cropping Mode".
                           # DBH height - height above ground to take DBH measurement
                           dbh_height = 1.3,      # 1.4m for New Zealand, 1.3m for the rest of the world
                           minimum_DBH = 0.035,  # (metres) trees having DBH smaller than minimum_DBH will be deleted

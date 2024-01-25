@@ -1003,7 +1003,7 @@ class MeasureTree:
         plot_slope_diff = np.percentile(self.DTM[:,2],99) - np.min(self.DTM[:,2]) # to be used as adjustment to slice height
 
         print('---Finding clusters of stem points---')
-        for slice_height in slice_heights:  # slicing the plot horizontaly
+        for slice_height in slice_heights:  # slicing the plot horizontaly # --- Joo edited, for saving, need to be uncommented
             if i % 10 == 0:
                 print('\r', i, '/', max_i, end='')
             i += 1
@@ -1044,8 +1044,8 @@ class MeasureTree:
                     ransac_points = np.vstack((ransac_points, new_slice[true_mask]))
 
         print('\r', max_i, '/', max_i, end='')
-        print('\nDone\n')
-        # save_file(self.output_dir + 'stem_points_clusters.laz', ransac_points, headers_of_interest=list(self.stem_dict), silent=False, offsets=self.offsets)
+        print('\nDone\n') 
+        # # save_file(self.output_dir + 'stem_points_clusters.laz', ransac_points, headers_of_interest=list(self.stem_dict), silent=False, offsets=self.offsets) # don't need at moment, Joo
 
         # Sanity check for number of skeleton points 
         if (skeleton_array.shape[0] < 1) :
@@ -1079,7 +1079,7 @@ class MeasureTree:
         skeleton_array = skeleton_array[np.in1d(indices, ids) , :] 
 
         print("---Saving skeleton and cluster array---")
-        save_file(self.output_dir + 'skeleton_cluster_visualisation.laz', skeleton_array, ['X', 'Y', 'Z', 'cluster'], offsets=self.offsets)
+        # save_file(self.output_dir + 'skeleton_cluster_visualisation.laz', skeleton_array, ['X', 'Y', 'Z', 'cluster'], offsets=self.offsets)  # --- Joo edited, for saving, need to be uncommented
 
         # split execution here TODO TODO
 
@@ -1111,17 +1111,17 @@ class MeasureTree:
 
             skel_cluster = skeleton_array[skeleton_array[:, -1] == cluster_id, :3]
             skel_tree = spatial.cKDTree(skel_cluster, leafsize=100000)
-            results = np.unique(np.hstack(skel_tree.query_ball_tree(medians_kdtree, r=0.0001))) #  a list of skeleton points, not stem points
-            point_data_clean = point_data[results, :3]        # these are stem points      
-            point_data_clean = np.unique(point_data_clean, axis=0)                                    
+            results = np.unique(np.hstack(skel_tree.query_ball_tree(medians_kdtree, r=0.0001))) #  a list of skeleton points, not stem points 
+            point_data_clean = point_data[results, :3]        # these are stem points       
+            point_data_clean = np.unique(point_data_clean, axis=0)                                     
             input_data.append([skel_cluster[:, :3], point_data_clean[:, :3], cluster_id, self.num_neighbours,
-                            self.cyl_dict])
+                            self.cyl_dict]) 
 
-            ransac_points = np.vstack((ransac_points, point_data_clean[:,:3]))
+            ransac_points = np.vstack((ransac_points, point_data_clean[:,:3])) 
 
-        print('\r', max_i, '/', max_i, end='')
-        print('\nDone\n')
-        save_file(self.output_dir + 'stem_points_for_ransac.laz', ransac_points, headers_of_interest=list(self.stem_dict)[:3], offsets=self.offsets)
+        print('\r', max_i, '/', max_i, end='') 
+        print('\nDone\n') 
+        # save_file(self.output_dir + 'stem_points_for_ransac.laz', ransac_points, headers_of_interest=list(self.stem_dict)[:3], offsets=self.offsets) # Joo edited, 
 
 
         # TODO try to send data to GPU
@@ -1130,7 +1130,7 @@ class MeasureTree:
         max_j = len(input_data)
         outputlist = []
         with get_context("spawn").Pool(processes=self.num_procs) as pool:
-            for i in pool.imap_unordered(MeasureTree.threaded_cyl_fitting, input_data):       
+            for i in pool.imap_unordered(MeasureTree.threaded_cyl_fitting, input_data):
                 # print(i)          
                 outputlist.append(i)
                 print('\r', j, '/', max_j, end='')
@@ -1139,7 +1139,7 @@ class MeasureTree:
         
         full_cyl_array = np.vstack(outputlist)      
         print("Saving cylinder array...")
-        save_file(self.output_dir + 'ransac_cyls.laz', full_cyl_array, headers_of_interest=list(self.cyl_dict)[:full_cyl_array.shape[1]], offsets=self.offsets)
+        # save_file(self.output_dir + 'ransac_cyls.laz', full_cyl_array, headers_of_interest=list(self.cyl_dict)[:full_cyl_array.shape[1]], offsets=self.offsets)  # --- Joo edited, for saving, need to be uncommented
 
 
 
@@ -1334,7 +1334,7 @@ class MeasureTree:
 
                             priority +=1            # assign stem priority
                             max_treeid +=1          # assign new tree_id
-                            print(f'priority {priority}')                       
+                            print(f'priority {priority}')
 
                             for child in child_ids :  # main skeleton of this leader 
                                 tree[tree[:,self.cyl_dict['branch_id']]==child, self.cyl_dict['main_stem']] = priority
@@ -1458,7 +1458,7 @@ class MeasureTree:
             print('\r', max_j, '/', max_j, end='')
             print('\nDone\n')
             print("\nSaving cylinder visualisation...")
-            save_file(self.output_dir + 'ransac_cyl_vis.laz', initial_cyl_vis, headers_of_interest=list(self.cyl_dict)[:initial_cyl_vis.shape[1]], offsets=self.offsets)
+            # save_file(self.output_dir + 'ransac_cyl_vis.laz', initial_cyl_vis, headers_of_interest=list(self.cyl_dict)[:initial_cyl_vis.shape[1]], offsets=self.offsets) # --- Joo edited, for saving, need to be uncommented
         
         
 
@@ -1681,7 +1681,7 @@ class MeasureTree:
             raise ValueError('Cannot connect into tree skeleton. Possibly a scan of very young trees!')
         
         headers = list(self.cyl_dict)[:sorted_cyl_array.shape[1]]
-        save_file(self.output_dir + 'initial_trees_cyls.laz', sorted_cyl_array, headers_of_interest=headers, offsets=self.offsets)
+        # save_file(self.output_dir + 'initial_trees_cyls.laz', sorted_cyl_array, headers_of_interest=headers, offsets=self.offsets) # --- Joo edited, for saving, need to be uncommented
         print("\n--------Saving cylinder data...")
         pd.DataFrame(sorted_cyl_array, columns=headers).to_csv(self.output_dir + 'initial_trees_cyls.csv', index=False, sep=',')
 
@@ -1689,7 +1689,7 @@ class MeasureTree:
         sorted_cyl_array = np.hstack((sorted_cyl_array, np.zeros((sorted_cyl_array.shape[0],1))))
         sorted_cyl_array[:,self.cyl_dict['height_above_dtm']] = get_heights_above_DTM(sorted_cyl_array[:,:3], self.DTM)
 
-        trees_cyl_array = self.stem_smoothing(sorted_cyl_array)
+        trees_cyl_array = self.stem_smoothing(sorted_cyl_array) # this is the moment for error
         if trees_cyl_array.shape[0]==0 :
             # sys.exit('Cannnot measure any tree. Exiting..')
             raise ValueError('Stem smoothing did not ouput any trees. Young trees or algorithm failure!')

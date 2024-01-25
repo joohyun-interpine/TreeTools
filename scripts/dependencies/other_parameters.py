@@ -28,9 +28,7 @@ class BaseParameters:
                             stem_class=4,  # Don't change
                             grid_resolution=0.5,  # Resolution of the DTM. !! Do not change before revising the make_dtm function, which is full of hard-coded values!!
                             vegetation_coverage_resolution=0.2,
-                                                    
                             num_neighbours=5,
-
                             # HDBSCAN clustering parameters -   # these are affected by the slice_thickness!!! :(
                             min_cluster_size=40,  # Used for HDBSCAN clustering step to find clusters of stem points. Recommend 30 for general use (3D).
                                                     # Aglika - use bigger value for larger trees - 50
