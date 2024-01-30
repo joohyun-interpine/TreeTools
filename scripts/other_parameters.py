@@ -4,12 +4,9 @@
 # optimisation is not straight-forward.
 
 other_parameters = dict(model_filename='model_original.pth',
-                        # box_dimensions=[6, 6, 6],  # Dimensions of the sliding box used for semantic segmentation.
-                        box_dimensions=[4,4,10],
-                        # box_dimensions=[1,1,1],
-                        ##box_dimensions=[4,4,10],
-                        box_overlap=[0.5, 0.5, 0.5],  # Overlap of the sliding box used for semantic segmentation.
-                        # box_overlap=[0.5, 0.5, 0.5],
+                        box_dimensions=[6, 6, 6],  # Dimensions of the sliding box used for semantic segmentation.
+                        # box_dimensions=[4,4,10],                        
+                        box_overlap=[0.5, 0.5, 0.5],  # Overlap of the sliding box used for semantic segmentation.                        
                         min_points_per_box=1000,  # Minimum number of points for input to the model. Too few points and it becomes near impossible to accurately label them (though assuming vegetation class is the safest bet here).
                         max_points_per_box=20000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
                         noise_class=0,  # Don't change
@@ -18,12 +15,10 @@ other_parameters = dict(model_filename='model_original.pth',
                         cwd_class=3,  # Don't change
                         stem_class=4,  # Don't change
                         grid_resolution=0.5,  # Resolution of the DTM. !! Do not change before revising the make_dtm function, which is full of hard-coded values!!
-                        vegetation_coverage_resolution=0.2,
-                                                
+                        vegetation_coverage_resolution=0.2,                                                
                         num_neighbours=5,
-
                         # HDBSCAN clustering parameters -   # these are affected by the slice_thickness!!! :(
-                        min_cluster_size=40,  # Used for HDBSCAN clustering step to find clusters of stem points. Recommend 30 for general use (3D).
+                        min_cluster_size=16,  # Used for HDBSCAN clustering step to find clusters of stem points. Recommend 30 for general use (3D).
                                                 # Aglika - use bigger value for larger trees - 50
                                                 # attempt to fit a cirle will be done on any cluster of min_cluster_size points
                         min_samples=10,       # used in a combination with min_cluster_size to keep clusters of dense points 

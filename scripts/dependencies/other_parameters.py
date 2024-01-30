@@ -10,8 +10,8 @@ class BaseParameters:
         pass         
     
     def other_parameters(self):
-            other_parameters = dict(model_filename='C:\RemoteSensing\MLS\TreeTools\model\model_original.pth',                                    
-                                    # model_filename='C:\RemoteSensing\MLS\TreeTools\model\FC_branch_4classes_Epoch904_ValEpochAcc-0p71.pth',
+            other_parameters = dict(model_filename='model_original.pth',
+                                    # model_filename='DecModel_Epoch1_ValEpochAcc-0p61.pth',
                             box_dimensions=[6, 6, 6],  # Dimensions of the sliding box used for semantic segmentation. # Joo-Hyun Testing
                             # box_dimensions=[4,4,10],
                             # box_dimensions=[1,1,1],
@@ -19,8 +19,8 @@ class BaseParameters:
                             box_overlap=[0.5, 0.5, 0.5],  # Overlap of the sliding box used for semantic segmentation.
                             # box_overlap=[0.5, 0.5, 0.5],
                             min_points_per_box=1000,  # Minimum number of points for input to the model. Too few points and it becomes near impossible to accurately label them (though assuming vegetation class is the safest bet here).
-                            max_points_per_box=20000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
-                            # max_points_per_box=200000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
+                            # max_points_per_box=20000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
+                            max_points_per_box=200000,  # Maximum number of points for input to the model. The model may tolerate higher numbers if you decrease the batch size accordingly (to fit on the GPU), but this is not tested.
                             noise_class=0,  # Don't change
                             terrain_class=1,  # Don't change
                             vegetation_class=2,  # Don't change
@@ -28,7 +28,9 @@ class BaseParameters:
                             stem_class=4,  # Don't change
                             grid_resolution=0.5,  # Resolution of the DTM. !! Do not change before revising the make_dtm function, which is full of hard-coded values!!
                             vegetation_coverage_resolution=0.2,
+                                                    
                             num_neighbours=5,
+
                             # HDBSCAN clustering parameters -   # these are affected by the slice_thickness!!! :(
                             min_cluster_size=40,  # Used for HDBSCAN clustering step to find clusters of stem points. Recommend 30 for general use (3D).
                                                     # Aglika - use bigger value for larger trees - 50

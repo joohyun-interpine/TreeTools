@@ -5,7 +5,7 @@ import numpy as np
 import glob
 import pandas as pd
 from preprocessing import Preprocessing
-from model import Net
+from model import Net, Gpu8gbNet
 # from sklearnex import patch_sklearn, config_context
 # patch_sklearn()
 from sklearn.neighbors import NearestNeighbors
@@ -130,8 +130,7 @@ class SemanticSegmentation:
         if self.parameters['use_CPU_only']:
             model.load_state_dict(torch.load('../model/' + self.parameters['model_filename'], map_location=torch.device('cpu')), strict=False)
         else:
-            # model.load_state_dict(torch.load('../model/' + self.parameters['model_filename']), strict=False)
-            model.load_state_dict(torch.load(self.parameters['model_filename']), strict=False)
+            model.load_state_dict(torch.load('../model/' + self.parameters['model_filename']), strict=False)
         
         # 2. 3. Let the model prepare the evaluation stage
         model.eval()

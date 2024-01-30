@@ -92,10 +92,11 @@ class DataPrep:
         
 def main():
     
-    folder_path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_TrainingSet\Train_Dataset\Train_DataSet_Normal'
+    folder_path = r'C:\Users\JooHyunAhn\Interpine\DataSets\TreeTools_PlayGroundSet\removing_ambigous_area'
     lassplit_path = r'C:\LAStools\bin\lassplit.exe'
     las2las_path = r'C:\LAStools\bin\las2las.exe'
-    selected_folder_path = r'C:\Users\JooHyunAhn\Interpine\GitRepos\TreeTools\data'
+    selected_folder_path = r'C:\RemoteSensing\MLS\TreeTools\data'
+    
     dpobj = DataPrep(folder_path)
     
     # unique_nominated_folder_path, unique_dropped_folder_path = dpobj.removing_ambigous_area(las2las_path)

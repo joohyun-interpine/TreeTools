@@ -585,7 +585,7 @@ class StraightnessScore:
 def main():
     
     parent_path = r'C:\Users\JooHyunAhn\Interpine\GitRepos\3d-pointcloud-materials\StraightnessScore\SampleData\Plot95_FT_output'
-    taper_path = r'C:\Users\JooHyunAhn\Interpine\GitRepos\3d-pointcloud-materials\StraightnessScore\SampleData\Plot95_FT_output\taper'    
+    taper_path = r'D:\Interpine\DataSets\TreeTools_PlayGroundSet\Straightess_issue\Plot95_FT_output\taper'    
     csv_file_path = r'C:\Users\JooHyunAhn\Interpine\GitRepos\3d-pointcloud-materials\StraightnessScore\SampleData\Plot95_FT_output\taper\Plot95_27.csv'    
     
     ssObj = StraightnessScore(parent_path)    
