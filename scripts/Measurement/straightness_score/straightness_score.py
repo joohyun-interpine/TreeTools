@@ -508,6 +508,74 @@ class StraightnessScore:
         sys.stdout = sys.__stdout__
         print(f"Output saved to {txt_file_path}")
         
+    def classifier_by_five(self, taper_path, file_name, ratio, height):
+        """
+        Depending on the ratio, the stem will be classified into a certain class such as 5, 4, 3, 2, 1
+
+        Args:
+            taper_path (str): the path where the 'taper' folder is 
+            file_name (str): the csv file name and extension
+            ratio (float): straightness score
+            height (float): the tree height
+        """
+  
+        class_two_height = 2
+        class_four_height = 4
+        
+        class_eight_ratio = 1/8
+        class_six_ratio = 1/6
+        class_five_ratio = 1/5
+        class_three_ratio = 1/3
+        class_half_ratio = 1/2
+        
+        file_no_extension = os.path.splitext(file_name)[0]
+        txt_file_path = os.path.join(taper_path, file_no_extension + ".txt")
+        
+        try:
+            # Redirect sys.stdout to the output file
+            with open(txt_file_path, 'w') as output_file:
+                sys.stdout = output_file
+            
+                print("{}:\n\n==== The straightness score for tree {} is being assessed ==== \n".format(file_name, file_name))
+                
+                if ratio < class_half_ratio:
+                    print("{}: Sweep rate '{:.2f}' < {:.2f}".format(file_name, ratio, class_half_ratio))
+                    if height > class_two_height:
+                        print("{}: Height '{}m' > {}m, Sweep rate '{:.2f}' < {:.2f}".format(file_name, height, class_two_height, ratio, class_half_ratio))
+                        if ratio < class_eight_ratio:
+                            classes = 5
+                            print("{}: {} - Peeler grade".format(file_name, classes))                    
+                            return classes
+                        elif class_eight_ratio <= ratio < class_six_ratio:
+                            classes = 4
+                            print("{}: {} - Under peeler grade, but straight".format(file_name, classes))
+                            return classes
+                        elif class_six_ratio <= ratio < class_five_ratio:
+                            classes = 3
+                            print("{}: {} - Long sawlogs".format(file_name, classes))
+                            return classes
+                        elif class_five_ratio <= ratio < class_three_ratio:
+                            classes = 2
+                            print("{}: {} - Rough sawlogs or pulp grade".format(file_name, classes))
+                            return classes
+                        else:                  
+                            classes = 1        
+                            print("{}: {} - Malform or Regen".format(file_name, classes))
+                            return classes
+                    else:
+                        print("{}: Height '{}m' <= {}m, Sweep rate '{:.2f}' < {:.2f}".format(file_name, height, class_two_height, ratio, class_half_ratio))                
+                        print("{}: {} - Malform or Regen".format(file_name))
+                        return classes
+                else:
+                    classes = 1
+                    print("{}: Sweep rate '{:.2f}' > {:.2f}".format(file_name, ratio, class_half_ratio))            
+                    print("{}: {} - Malform or Regen".format(file_name, classes))
+                    return classes
+        finally:
+            sys.stdout = sys.__stdout__            
+            print(f"Output saved to {txt_file_path}")
+                
+        
     def assess_under_folder(self, ssObj, taper_path):
         """
         using this code for multiple taper csv files that belong to a folder,
@@ -540,20 +608,30 @@ class StraightnessScore:
                 furthest_cylinders_info_dict = ssObj.get_length_hypotenuse_3d_coord(cylinders_info_height_sorted_df)    
                 ratio, height = ssObj.get_ratio(cylinders_info_height_sorted_df, furthest_cylinders_info_dict)
                 
-                ssObj.classifier(taper_path, file_name, ratio, height)            
+                # ssObj.classifier(taper_path, file_name, ratio, height)
+                classes = ssObj.classifier_by_five(taper_path, file_name, ratio, height)
+                df['Sw'] = None  # Initialize the new column if not already present
+                df.at[df.index[-1], 'Sw'] = classes
+                df.to_csv(each_tree_taper, index=False)        
+                print("classes", classes)      
                 
             else:
+                classes = "NA"
+                df['Sw'] = None  # Initialize the new column if not already present
+                df.at[df.index[-1], 'Sw'] = classes
+                df.to_csv(each_tree_taper, index=False)        
+                print("classes", classes)
+                
                 file_no_extension = os.path.splitext(file_name)[0]
-                txt_file_path = os.path.join(taper_path, file_no_extension + "_NoScore.txt")      
+                txt_file_path = os.path.join(taper_path, file_no_extension + "_NoScore.txt")
                           
                 with open(txt_file_path, 'a') as file:
                     # Append some text to the file                    
                     file.write("{}:\n\n==== The straightness score for tree {} is being assessed ==== \n".format(file_name, file_name))
                     file.write("\nPotentially, the branch has been detected as a stem, so straightness score has not been calculated.".format(file_name))
                     file.write("\nPlease have a look manually")
-                continue
-
-        
+                # continue
+    
     def assess_single_file(self, ssObj, taper_path, csv_file_path):
         """
         using this code for single taper csv files,        
@@ -579,14 +657,19 @@ class StraightnessScore:
         # From this, side of 3d view
         furthest_cylinders_info_dict = ssObj.get_length_hypotenuse_3d_coord(cylinders_info_height_sorted_df)    
         ratio, height = ssObj.get_ratio(cylinders_info_height_sorted_df, furthest_cylinders_info_dict)
-        ssObj.classifier(taper_path, file_name, ratio, height)
+        classes = ssObj.classifier_by_five(taper_path, file_name, ratio, height)
+        df['Sw'] = None  # Initialize the new column if not already present
+        df.at[df.index[-1], 'Sw'] = classes
+        df.to_csv(csv_file_path, index=False)
+        
+        print("classes", classes)
         
          
 def main():
     
-    parent_path = r'C:\Users\JooHyunAhn\Interpine\GitRepos\3d-pointcloud-materials\StraightnessScore\SampleData\Plot95_FT_output'
-    taper_path = r'D:\Interpine\DataSets\TreeTools_PlayGroundSet\Straightess_issue\Plot95_FT_output\taper'    
-    csv_file_path = r'C:\Users\JooHyunAhn\Interpine\GitRepos\3d-pointcloud-materials\StraightnessScore\SampleData\Plot95_FT_output\taper\Plot95_27.csv'    
+    parent_path = r'D:\Interpine\DataSets\TreeTools_PlayGroundSet\Straightess_issue\Plot95_FT_output'
+    taper_path = r'G:\Hancock Queensland Plantation\Current\Southern_Pine_genetics_trial\HQP_Red_Ridge_220\Reports_and_Presentations\StraightnessScore_Material\Plot95_FT_output\taper_5class'    
+    csv_file_path = r'D:\Interpine\DataSets\TreeTools_PlayGroundSet\Straightess_issue\Plot95_FT_output\taper_5class\Plot95_2.csv'
     
     ssObj = StraightnessScore(parent_path)    
     

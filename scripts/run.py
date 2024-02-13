@@ -2,8 +2,11 @@ from run_tools import FSCT, directory_mode, file_mode
 from dependencies.other_parameters import *
 from dependencies.configs_by_mls_or_als import *
 from dependencies.paramters_by_clients import *
+import os 
 
 import glob
+
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 
 if __name__ == '__main__':
@@ -36,7 +39,7 @@ if __name__ == '__main__':
       scan_param_dict = machine_config_obj.mobile_laser_scanning()
 
     for point_cloud_filename in point_clouds_to_process:
-        parameters = client_param_obj.abp(point_cloud_filename)
+        parameters = client_param_obj.joohyun(point_cloud_filename)
         parameters.update(base_param_obj)
         parameters = parameters | scan_param_dict # Math Union - the second operand overwrites the first!
 
@@ -45,7 +48,7 @@ if __name__ == '__main__':
            FSCT(parameters=parameters,
              # Set below to 0 or 1 (or True/False). Each step requires the previous step to have been run already.
              # For standard use, just leave them all set to 1 except "clean_up_files".
-             preprocess   = 1,  # Preparation for semantic segmentation.
+             preprocess   = 0,  # Preparation for semantic segmentation.
              segmentation = 1,  # Deep learning based semantic segmentation of the point cloud.
              postprocessing = 0,  # Creates the DTM and applies some simple rules to clean up the segmented point cloud.
              measure_plot = 0,  # The bulk of the plot measurement happens here.
