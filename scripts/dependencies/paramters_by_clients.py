@@ -689,7 +689,7 @@ class Parameters:
                           stem_sorting_range=1.2,  # Stem points can be, at most, this far away from a cylinder center in 3D to be matched to a particular tree.
                          
                           # Set these appropriately for your hardware.
-                          batch_size=8,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
+                          batch_size=2,  # If you get CUDA errors, try lowering this. This is suitable for 24 GB of vRAM.
                           num_procs=12,  # Number of CPU cores you want to use. If you run out of RAM, lower this.
                           use_CPU_only=False,  # Set to True if you do not have an Nvidia GPU, or if you don't have enough vRAM.
                          

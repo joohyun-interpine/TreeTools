@@ -57,8 +57,12 @@ class LazFileWriter:
             list: a list of .laz files that have 'label' info
         """
         label_contained_laz_list = []
+        excluded_strings = ['segmented_raw', 'terrain_points']
 
         for each_laz_file in self.laz_file_paths:
+            if any(excluded_str in each_laz_file for excluded_str in excluded_strings):
+                continue  # Skip this file if it contains any excluded string
+            
             las_file = laspy.read(each_laz_file)
             point_format = las_file.point_format
             field_names = list(point_format.dimension_names)

@@ -45,6 +45,7 @@ class PostProcessing:
         self.point_cloud, self.headers_of_interest = load_file(self.output_dir+'segmented_raw.laz', headers_of_interest=load_headers_of_interest)
         
         self.point_cloud = np.hstack((self.point_cloud, np.zeros((self.point_cloud.shape[0], 1))))  # Add height above DTM column
+
         self.headers_of_interest.append('height_above_dtm')  # Add height_above_DTM to the headers.
         self.label_index = self.headers_of_interest.index('label')
         self.point_cloud[:, self.label_index] = self.point_cloud[:, self.label_index] + 1  # index offset since noise_class was removed from inference. Check parameters for reference
@@ -142,10 +143,32 @@ class PostProcessing:
             save_file(self.output_dir + 'stem_points.laz', self.stem_points, headers_of_interest=self.headers_of_interest, silent=False, offsets=xyz_offsets)
             save_file(self.output_dir + 'cwd_points.laz', self.cwd_points, headers_of_interest=self.headers_of_interest, silent=False, offsets=xyz_offsets)
 
+        self.headers_of_interest.insert(len(self.headers_of_interest), 'classification') 
+        self.stem_dict = dict(zip(self.headers_of_interest,range(len(self.headers_of_interest)))) 
+        self.stem_points = self.point_cloud[self.point_cloud[:, self.headers_of_interest.index('label')] == self.parameters['stem_class'],:]
+        self.vegetation_points= self.point_cloud[self.point_cloud[:, self.headers_of_interest.index('label')] == self.parameters['vegetation_class'],:] 
+        self.vegetation_points = np.hstack((self.vegetation_points, np.zeros((self.vegetation_points.shape[0], 1))))
+        # Height Classsification
+        if not ('tree_id' in self.stem_dict.keys()): 
+            self.point_cloud = np.hstack((self.point_cloud, np.zeros((self.point_cloud.shape[0],1))))
+            class_col=-1 
+        else: 
+            class_col=self.stem_dict['tree_id'] 
+
+        height_col = self.stem_dict['height_above_dtm']
+        mask = self.point_cloud[:,height_col]<=0.1 # ground   
+        self.point_cloud[mask,class_col] = 2  # ground class - 10 cm above DTM
+        mask = np.logical_and(self.point_cloud[:,height_col]>.1, self.point_cloud[:,height_col]<=0.3) 
+        self.point_cloud[mask,class_col] = 3  # low vegetation - 10 to 30cm above DTM 
+        mask = np.logical_and(self.point_cloud[:,height_col]>0.3, self.point_cloud[:,height_col]<=2) 
+        self.point_cloud[mask,class_col] = 4  # medium vegetation - 30cm to 2m above dtm 
+        mask = self.point_cloud[:,height_col]>2 
+        self.point_cloud[mask,class_col] = 5  # high vegetation - above 2m   
+        
         if xyz_offsets[0] > 10000 : filename = "C2_E_N"
         else : filename ="C2_0_0"
-        save_file(f'{self.output_dir}{filename}.laz', self.point_cloud, headers_of_interest=self.headers_of_interest, offsets=xyz_offsets)
-        
+        save_file(f'{self.output_dir}{filename}.laz', self.point_cloud, headers_of_interest=list(self.stem_dict), offsets=xyz_offsets)
+               
         # os.remove(self.output_dir + 'segmented_raw.laz')
 
         self.post_processing_time_end = time.time()
