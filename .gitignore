@@ -29,7 +29,8 @@ wkhtmltopdf/
 *.bak
 *.csv
 
+
 venv
 docker
 tools
-model
+# model
