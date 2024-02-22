@@ -10,8 +10,8 @@ class BaseParameters:
         pass         
     
     def other_parameters(self):
-            other_parameters = dict(model_filename='model_original.pth',
-                                    # model_filename='DecModel_Epoch1_ValEpochAcc-0p61.pth',
+            other_parameters = dict(model_filename='FC_upperstem_branch_4classes_Epoch555_ValEpochAcc-0p68.pth',
+                                    # model_filename='model_original.pth',                                    
                             box_dimensions=[6, 6, 6],  # Dimensions of the sliding box used for semantic segmentation. # Joo-Hyun Testing
                             # box_dimensions=[4,4,10],
                             # box_dimensions=[1,1,1],

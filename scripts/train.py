@@ -394,7 +394,7 @@ class TrainModel:
 def set_params():    
     parameters = dict(
         preprocess_train_datasets=0, # If 1, the model will preprocess the training datasets. If 0, the model will use the preprocessed training datasets.
-        preprocess_validation_datasets=1, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
+        preprocess_validation_datasets=0, # If 1, the model will preprocess the validation datasets. If 0, the model will use the preprocessed validation datasets.
         clean_sample_directories=0,  # Deletes all samples in the sample directories.
         perform_validation_during_training=1, # If 1, the model will perform validation during training. If 0, the model will only perform validation after training.
         generate_point_cloud_vis=0,  # Useful for visually checking how well the model is learning. Saves a set of samples called "latest_prediction.las" in the "FSCT/data/"" directory. Samples have label and prediction values.
@@ -402,7 +402,7 @@ def set_params():
         num_epochs=5000, # The number of epochs to train the model for.
         learning_rate=0.000025, # don't change if you don't understand how it will affect the model
         input_point_cloud=None, # If you want to use a custom point cloud, set this to the path of the point cloud. If you want to use the FSCT dataset, set this to None.
-        model_filename="FC_branch_4classes.pth", # The model will be saved as this filename in the "FSCT/model/" directory.
+        model_filename="onetree.pth", # The model will be saved as this filename in the "FSCT/model/" directory.
         sample_box_size_m=np.array([6, 6, 6]), # The size of the sample boxes in meters. The model will be trained on these boxes.
         sample_box_overlap=[0.5, 0.5, 0.5], # The overlap between sample boxes. The model will be trained on these boxes.
         min_points_per_box=1000, # The minimum number of points that must be in a sample box for it to be used for training.

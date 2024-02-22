@@ -45,8 +45,8 @@ if __name__ == '__main__':
            FSCT(parameters=parameters,
              # Set below to 0 or 1 (or True/False). Each step requires the previous step to have been run already.
              # For standard use, just leave them all set to 1 except "clean_up_files".
-             preprocess   = 0,  # Preparation for semantic segmentation.
-             segmentation = 0,  # Deep learning based semantic segmentation of the point cloud.
+             preprocess   = 1,  # Preparation for semantic segmentation.
+             segmentation = 1,  # Deep learning based semantic segmentation of the point cloud.
              postprocessing = 1,  # Creates the DTM and applies some simple rules to clean up the segmented point cloud.
              measure_plot = 1,  # The bulk of the plot measurement happens here.
              make_report  = 1,  # Generates a plot report, plot map, and some other figures.
